@@ -1,0 +1,87 @@
+ try{
+        int size = stoi(s);
+        if(size <= 0){
+            cout << "Error: El tamaño del disco debe ser mayor a 0" << endl;
+            return;
+        }
+        //Tamaño de las unidades
+        if (strcmp(u.c_str(), "k")){
+            size = size * 1024;
+        } else if ((strcmp(u.c_str(), "m") )){
+            size = size * 1024 * 1024;
+        } else if ((strcmp(u.c_str(), "") )){
+            size = size * 1024 * 1024;
+        }else{
+            cout << "Error: Unidad no valida" << endl;
+            return;
+        }
+        //Ajuste del disco
+        disco.mbr_tamano = size;
+        disco.mbr_fecha_creacion = time(nullptr);
+        if (f == "ff"){
+            disco.dsk_fit = 'F';
+        } else if (f == "bf"){
+            disco.dsk_fit = 'B';
+        } else if (f == "wf"){
+            disco.dsk_fit = 'W';
+        }
+        disco.mbr_dsk_signature = rand() % 9999 + 100;
+        //Creacion del disco
+        FILE *fileV = fopen(path.c_str(), "r");
+        if(fileV != NULL){
+            cout << "MKDISK" <<"Error: Disco ya existente en la ruta indicada"<< endl;
+            fclose(fileV);
+            return;
+        }
+
+        disco.mbr_partition_1 = StructD::Partition();
+        disco.mbr_partition_2 = StructD::Partition();
+        disco.mbr_partition_3 = StructD::Partition();
+        disco.mbr_partition_4 = StructD::Partition();
+
+        if (validPath(path) == false){
+            cout << "MKDISK" <<"Error: Ruta no valida"<< endl;
+            return;
+        }
+
+        try{
+            FILE *file = fopen(path.c_str(), "w+b");
+            if(file != NULL){
+                fwrite("\0",1,1,file);
+                fseek(file, size-1, SEEK_SET);
+                fwrite("\0",1,1,file);
+                rewind(file);
+                fwrite(&disco, sizeof(StructD::MBR), 1, file);
+                fclose(file);
+            }else{
+
+            }
+        } catch (exception e){
+            cout << "MKDISK" <<"Error: No se pudo crear el disco"<< endl;
+        }
+    }catch(exception  &e){
+        cout << "MKDISK" <<"Error: Tamaño del disco no valido"<< endl;
+    }
+
+
+
+    if(ExistC(newPath) == 2){
+            CreatC(newPath);
+        }
+
+
+
+          FILE *disco2;
+          char nul = '\0';
+          disco2 = fopen(pathaux.c_str(), "rb+");
+          rewind(disco2);
+          long int tam = atoi(s.c_str()) * size;
+          for (int var = 0; var < tam; ++var) {
+              fwrite(&nul, sizeof(nul), 1, disco2);
+          }
+          fclose(disco2);
+
+          disco2 = fopen(pathaux.c_str(), "rb+");
+          rewind(disco2);
+          fwrite(&disco, sizeof(disco), 1, disco2);
+          fclose(disco2);
