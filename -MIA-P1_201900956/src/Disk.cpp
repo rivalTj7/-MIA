@@ -62,6 +62,7 @@ void Disk :: mkdisk(string s, string f, string u, string path){
         FILE *fle;
         fle = fopen(path2, "wb+");
         fclose(fle);
+
         char nul = '\0';
         FILE * fileC;
         fileC = fopen(path2, "rb+");
@@ -83,9 +84,101 @@ void Disk :: mkdisk(string s, string f, string u, string path){
 }
 
 void Disk::rmdisk(string path){
+    if(path != ""){
+        FILE * del;
+        if(validPath(path) == false){
+            cout << "Error: La la extensión de la ruta no es correcta" << endl;
+            return;
+        }
+        del = fopen(path.c_str(), "r");
+        if(del != nullptr){
+            fclose(del);
+            remove(path.c_str());
+            cout << "Disco eliminado" << endl;
+        }else{
+            cout << "Error: El disco no existe" << endl;
+        }
 
+    }else{
+        cout << "Error: No se ha ingresado la ruta del disco" << endl;
+    }
 }
 
+void Disk::fdisk(string s, string u, string p, string t, string f, string d, string n, string a){
+        cout << "Crear Partición .................... . . . . " << endl;
+        try{
+            int size = stoi(s);
+            if( size <= 0){
+                throw runtime_error("El tamaño de la partición debe ser mayor a 0");
+            }
+            if (strcmp(u.c_str(), "b")){
+                size = size * 1024;
+            } else if ((strcmp(u.c_str(), "k") )){
+                size = size * 1024 * 1024;
+            }else if((strcmp(u.c_str(), "m") )) {
+                size = size * 1024 * 1024 * 1024;
+            }else{
+                size = size;
+            }
+            StructD::MBR disco;
+            FILE *file = fopen(p.c_str(), "rb+");
+            if(file!= NULL){
+                rewind(file);
+                fread(&disco, sizeof(disco), 1, file);
+            }else{
+                throw runtime_error("El disco no existe");
+            }
+            fclose(file);
+
+            if (t == "p"){
+                cout << "Crear Partición Primaria .................... . . . . " << endl;
+                if(validName(p, n) == 1){
+                    throw runtime_error("El nombre de la partición ya existe");
+                }else{
+                    cout << "Creando Particion Primario" << endl;
+                    createPrimariKey(p, t, f, size, n);
+                }
+            }else if (t == "e"){
+                cout << "Crear Partición Extendida .................... . . . . " << endl;
+
+            }else if (t == "l"){
+                cout << "Crear Partición Lógica .................... . . . . " << endl;
+            }
+
+
+        }catch (exception &e){
+            cout << "Error: " << e.what() << endl;
+        }
+}
+
+void Disk::createPrimariKey(string path, string type, string fit, int add, string name){
+    StructD::MBR disco;
+    //Validar el tamaño de la particion
+    if (add >= disco.mbr_tamano){
+        throw runtime_error("El tamaño de la partición es mayor al tamaño del disco");
+    }
+}
+
+void Disk::Rep(string id, string name, string path){
+    cout << "Reporte .................... . . . . " << endl;
+    ofstream file;
+    file.open("graph.dot",ios::out);
+    if(!file.fail()){
+        file << "digraph Grafica{\nbgcolor=deepskyblue;\n";
+        file << "graph [ratio=fill];\n";
+        file << "node [label=\"\\N\", fontsize=15, shape=plaintext];";
+        file << "graph [bb=\"0,0,352,154\"];";
+        file << "arset [label=<\n";
+
+        //double size_disk = mbr_disk.mbr_tamano;
+        //double size_free_disk = mbr_disk.mbr_tamano_available;
+
+
+
+        file << "</TR></TABLE>>,];}";
+        file.close();
+    }
+}
 
 // optiene del disco duro  --------------------------------------------------------------
 string Disk :: killComillas(string path){
@@ -148,7 +241,7 @@ void Disk::CreatDir(string path){
     char newPath[500];
     strcpy(newPath, newF.c_str());
     cout << "Ruta de almacenaje creada"<< newPath << endl;
-    if(ExistC(newPath) == false){
+    if(ExistC(newPath) == 2){
         cout << "Ruta creada" << endl;
         CreatC(newPath);
     } else {
@@ -172,4 +265,41 @@ void Disk::CreatC(char path []){
     strcat(command, "\"");
 
     system(command);
+}
+
+int Disk::validName(string path, string name){
+    char ruta[500];
+    char nombre[16];
+    strcpy(ruta, path.c_str());
+    strcpy(nombre, name.c_str());
+
+    if(ExistC(ruta) == 1){
+        FILE *file = fopen(ruta, "rb+");
+        rewind(file);
+
+        StructD::MBR mbr;
+
+        fread(&mbr, sizeof(mbr), 1, file);
+        vector<StructD::Partition> ebr = Partittion(mbr);
+        if(file != nullptr){
+            for (int i = 0; i < 4; i++){
+                if(ebr[i].part_status == 'V'){
+                    if(strcmp(ebr[i].part_name, nombre) == 0){
+                        return 1;
+                    }
+                }
+            }
+        }
+        fclose(file);
+    }
+    return 0;
+}
+
+vector<StructD::Partition> Disk::Partittion(StructD:: MBR mbr){
+    vector<StructD::Partition> part;
+    part.push_back(mbr.mbr_partition_1);
+    part.push_back(mbr.mbr_partition_2);
+    part.push_back(mbr.mbr_partition_3);
+    part.push_back(mbr.mbr_partition_4);
+    return part;
 }

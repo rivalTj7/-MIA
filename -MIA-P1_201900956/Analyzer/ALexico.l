@@ -37,9 +37,9 @@ comentarios [#]+.*
 "-u"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_U;}
 "-path"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Path;}
 "RMDISK"                    { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Rmdisk;}
-"BF"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Bf;}
-"FF"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Ff;}
-"WF"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Wf;}
+"bf"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Bf;}
+"ff"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Ff;}
+"wf"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Wf;}
 
 "BestFit"                   { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_BestFit;}
 "FirstFIt"                  { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_FirstFit;}
@@ -51,12 +51,12 @@ comentarios [#]+.*
 "FDISK"                     { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Fdisk;}
 "-t"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Type;}
 "-type"                     { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Type2;}
-"delete"                    { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Delete;}
-"name"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Name;}
-"add"                       { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Add;}
+"-delete"                    { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Delete;}
+"-name"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Name;}
+"-add"                       { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Add;}
 "mount"                     { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Mount;}
 "unmount"                   { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Unmount;}
-"id"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Id;}
+"-id"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Id;}
 "MKFS"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Mkfs;}
 "-fs"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Fs;}
 "fast"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Fast;}
@@ -95,6 +95,7 @@ comentarios [#]+.*
 "l"                         { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_L;}
 "rep"                       { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Rep;}
 "ruta"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Ruta;}
+
 "mbr"                       { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Mbr;}
 "disk"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Disk;}
 "inode"                     { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Inode;}
@@ -105,6 +106,7 @@ comentarios [#]+.*
 "tree"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Tree;}
 "sb"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Sb;}
 "ls"                        { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Ls;}
+
 "exec"                      { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Exec;}
 
 "."                         { yycolum+= yyleng; strcpy(yylval.TEXT, yytext); return TK_Punto;}

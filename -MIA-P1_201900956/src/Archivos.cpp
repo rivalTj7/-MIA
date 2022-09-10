@@ -35,14 +35,56 @@ void Archivos::Recorrer(vector<Nodo> * Hojas){
         disco.mkdisk(s, f, u, path);
     }else if(raiz->nodo_type == "rmdisk") {
         string path = "";
-        cout << "rmdisk" << endl;
-        for (int i = 0; i < raiz->Hojas->size(); i++) {
-            if (raiz->Hojas->at(i).nodo_type == "-path") {
+        cout << "rmdisk................ . . .. . . . . . .. . " << endl;
+        path = raiz->nodo_value;
+        disco.rmdisk(path);
+    }
+    else if(raiz->nodo_type == "fdisk"){
+        cout << "fdisk .................... . . . . . . . " << endl;
+        string size = "";
+        string unit = "";
+        string path = "";
+        string type = "";
+        string fit = "";
+        string delete_ = "";
+        string name = "";
+        string add = "";
+        for ( int i = 0; i < raiz->Hojas->size(); i++){
+            if(raiz->Hojas->at(i).nodo_type == "-s") {
+                size = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-u") {
+                unit = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-path") {
                 path = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-type") {
+                type = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-f") {
+                fit = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-delete") {
+                delete_ = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-name") {
+                name = raiz->Hojas->at(i).nodo_value;
+            }else if(raiz->Hojas->at(i).nodo_type == "-add") {
+                add = raiz->Hojas->at(i).nodo_value;
             }
         }
-    }
-    else{
+        disco.fdisk(size, unit, path, type, fit, delete_, name, add);
+    }else if(raiz->nodo_type == "rep"){
+        cout << "rep" << endl;
+        string id = "";
+        string name = "";
+        string path = "";
+        string ruta = "";
+        for ( int i = 0; i < raiz->Hojas->size(); i++){
+             if(raiz->Hojas->at(i).nodo_type == "-name") {
+                 if (raiz->Hojas->at(i).nodo_value == "mbr") {
+                        cout << "Create Reporte MBR................. . . . . . . ." << endl;
+
+                 }
+             }
+        }
+        disco.Rep(id, name, path);
+    }else{
         cout << "Comando Erroneo" << endl;
     }
 }

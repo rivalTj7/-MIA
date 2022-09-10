@@ -20,6 +20,8 @@
 
     //Variables
     string F = "ff", U = "m", S = "", D="", A= "";
+    string T = "", U2 = "", F2 = "", DEl = "", NAM = "", ADD = "";
+    string NAMREP = "";
 
     int yyerror(const char* mens)
     {
@@ -173,7 +175,8 @@ COMANDOS        : MKDISK {raiz = $1;}
                 | UNMOUNT { raiz = $1;}
                 | MKFS { raiz = $1;}
                 | EXEC { raiz = $1;}
-                | PAUSE { raiz = $1;};
+                | PAUSE { raiz = $1;}
+                | REP { raiz = $1;};
 
                 //Crear Administración de Usuarios y Grupos:
 
@@ -231,42 +234,94 @@ AJUSTE          : TK_Bf {
                 };
 
 // -------------------- RMDISK --------------------
-RMDISK         	: TK_Rmdisk TK_Path TK_Igual DIRECCION { };
+RMDISK         	: TK_Rmdisk TK_Path TK_Igual DIRECCION {
+                     $$ = new Nodo($1,D,new vector<Nodo>());
+                };
+
 // -------------------- FDISK --------------------
-FDISK	  	    : TK_Fdisk OP_FDISK { };
+FDISK	  	    : TK_Fdisk OP_FDISK {
+                    $$ = new Nodo($1,$1,$2->Hojas);
+                };
 
-OP_FDISK	    : OP_FDISK LOP_FDISK { }
-		        | LOP_FDISK { };
+OP_FDISK	    : OP_FDISK LOP_FDISK {
+                    $$ = $1;
+                    $$->Hojas->push_back(*$2);
+                }
+                | LOP_FDISK {
+                    $$->Hojas->push_back(*$1);
+                };
+
 //fdisk -t->E -path->/home/Disco2.dsk -u->K -name->Particion2 -s->300
-LOP_FDISK	    : TK_Size TK_Igual TK_Entero { }
-		        | TK_Path TK_Igual DIRECCION { }
-		        | TK_Menos TK_Name TK_Igual NAME { }
-		        | TK_Type TK_Igual TYPE_PARTITION { }
-		        | TK_U TK_Igual UNIDAD_2 { }
-		        | TK_F TK_Igual AJUSTE_2 { }
-		        | TK_Menos TK_Delete TK_Igual DELETE { }
-		        | TK_Menos TK_Add TK_Igual TK_Entero { }
-		        | TK_Menos TK_Add TK_Igual TK_Menos TK_Entero { };
+LOP_FDISK	    : TK_Size TK_Igual TK_Entero {
+                    $$ = (new Nodo($1,$3,new vector<Nodo>()));
+                }
+		        | TK_Path TK_Igual DIRECCION {
+		            $$ = (new Nodo($1,D,new vector<Nodo>()));
+		        }
+		        | TK_Name TK_Igual NAME {
+		            $$ = (new Nodo($1,NAM,new vector<Nodo>()));
+                }
+		        | TK_Type TK_Igual TYPE_PARTITION {
+		            $$ = (new Nodo($1,T,new vector<Nodo>()));
+                }
+		        | TK_U TK_Igual UNIDAD_2 {
+		            $$ = (new Nodo($1,U2,new vector<Nodo>()));
+                }
+		        | TK_F TK_Igual AJUSTE_2 {
+		            $$ = (new Nodo($1,A,new vector<Nodo>()));
+                }
+		        | TK_Delete TK_Igual DELETE {
+		            $$ = (new Nodo($1,DEl,new vector<Nodo>()));
+                }
+		        | TK_Add TK_Igual TK_Entero {
+		            $$ = (new Nodo($1,$3,new vector<Nodo>()));
+                };
 
-TYPE_PARTITION	: TK_P { }
-		        | TK_E { }
-		        | TK_L { };
+TYPE_PARTITION	: TK_P {
+                    T = $1;
+                }
+                | TK_E {
+                    T = $1;
+                }
+                | TK_L {
+                    T = $1;
+                };
 
-UNIDAD_2	    : TK_B { }
-		        | TK_K { }
-		        | TK_M { };
+UNIDAD_2	    : TK_B {
+                    U2 = $1;
+                }
+		        | TK_K {
+		            U2 = $1;
+                }
+		        | TK_M {
+		            U2 = $1;
+                };
 
-DELETE		    : TK_Full { };
+DELETE		    : TK_Full {
+                    DEl = $1;
+                };
 
-AJUSTE_2	    : TK_BestFit { }
-		        | TK_FirstFit { }
-		        | TK_WorstFit { };
+AJUSTE_2	    : TK_Ff {
+                    A = $1;
+                }
+                | TK_Bf {
+                    A = $1;
+                }
+                | TK_Wf {
+                    A = $1;
+                };
 
-NAME		    : TK_Cadena { }
-		        | TK_Identificador { };
+NAME		    : TK_Cadena {
+                    NAM= $1;
+                }
+		        | TK_Identificador {
+		            NAM = $1;
+                };
 
 // -------------------- MOUNT --------------------
-MOUNT		    : TK_Mount OP_MOUNT { };
+MOUNT		    : TK_Mount OP_MOUNT {
+                    $$ = new Nodo($1,$1,$2->Hojas);
+                };
 
 OP_MOUNT	    : OP_MOUNT LOP_MOUNT { }
 		        | LOP_MOUNT { };
@@ -298,3 +353,61 @@ PAUSE		    : TK_Pause {
 			        printf("Presione una tecla para continuar...");
 			        int c = getchar();
  		        };
+
+// -------------------- REP --------------------
+REP		        : TK_Rep OP_REP {
+                    $$ = new Nodo($1,$1,$2->Hojas);
+                };
+
+OP_REP		    : OP_REP LOP_REP {
+                    $$ = $1;
+                    $$->Hojas->push_back(*$2);
+                }
+                | LOP_REP {
+                    $$->Hojas->push_back(*$1);
+                };
+
+LOP_REP		    :TK_Id TK_Igual NAME {
+                    $$ = (new Nodo($1,NAM,new vector<Nodo>()));
+                }
+                |TK_Path TK_Igual DIRECCION {
+                    $$ = (new Nodo($1,D,new vector<Nodo>()));
+                }
+                |TK_Mame TK_Igual NAME2 {
+                    $$ = (new Nodo($1,NAMREP,new vector<Nodo>()));
+                };
+
+ NAME2          : TK_Mbr {
+                    NAMREP  = $1;
+                }
+                | TK_Disk {
+                    NAMREP  = $1;
+                }
+                | TK_Inode {
+                    NAMREP = $1;
+                }
+                | TK_Journaling {
+                    NAMREP = $1;
+                }
+                | TK_Block {
+                    NAMREP = $1;
+                }
+                | TK_Bm_inode {
+                    NAMREP = $1;
+                }
+                | TK_Bm_block {
+                    NAMREP = $1;
+                }
+                | TK_Tree {
+                    NAMREP = $1;
+                }
+                | TK_Sb{
+                    NAMREP = $1;
+                }
+                | TK_File{
+                    NAMREP = $1;
+                }
+                | TK_Ls{
+                    NAMREP = $1;
+                };
+

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <vector>
 #include <sys/stat.h>
 #include "StructD.h"
 
@@ -20,9 +21,15 @@ public:
     Disk();
     void mkdisk(string size, string ajuste, string unit, string path);
     void rmdisk(string path);
+    void fdisk(string size, string unit, string path, string type, string fit, string delete_, string name, string add);
+    void createPrimariKey(string path, string type, string fit, int add, string name);
+    void Rep(string id, string name, string path);
 
+
+    vector<StructD::Partition> Partittion(StructD:: MBR mbr);
     string killComillas(string path);
     bool compare(string path, string name);
+    int validName(string path, string name);
     int ExistC(char path[]);
     void CreatDir(string paht);
     void CreatC(char paht []);
