@@ -15,8 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./include/nodo.h"
 #include "./Analyzer/parser.h"
+#include "./include/nodo.h"
 #include "./Analyzer/scanner.h"
 #include "./include/Disk.h"
 

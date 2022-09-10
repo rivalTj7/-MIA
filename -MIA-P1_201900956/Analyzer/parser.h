@@ -167,7 +167,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 35 "ASintactico.y"
+#line 36 "ASintactico.y"
 
     char TEXT [256];
     class  Nodo* Nodo_tmp;

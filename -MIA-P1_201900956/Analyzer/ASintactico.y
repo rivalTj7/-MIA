@@ -22,10 +22,11 @@
     string F = "ff", U = "m", S = "", D="", A= "";
     string T = "", U2 = "", F2 = "", DEl = "", NAM = "", ADD = "";
     string NAMREP = "";
+    string Format = "";
 
     int yyerror(const char* mens)
     {
-        std::cout << mens <<" "<<yytext<< std::endl;
+        std::cout << "Error: " << mens <<" "<<yytext<< std::endl;
         return 0;
     }
 %}
@@ -152,6 +153,7 @@
 %type<Nodo_tmp> MKFS OP_MKFS LOP_MKFS TYPE_FORMAT
 %type<Nodo_tmp> EXEC
 %type<Nodo_tmp> PAUSE
+%type<Nodo_tmp> REP OP_REP LOP_REP
 
 //Precedens..
 %left suma menos
@@ -162,7 +164,7 @@
 %%
 
 INICIO          : LCMD {
-			        cout << "INICIO" << endl;
+
 		        };
 
 LCMD            : LCMD COMANDOS { }
@@ -176,7 +178,7 @@ COMANDOS        : MKDISK {raiz = $1;}
                 | MKFS { raiz = $1;}
                 | EXEC { raiz = $1;}
                 | PAUSE { raiz = $1;}
-                | REP { raiz = $1;};
+                | REP { raiz = $1;} ;
 
                 //Crear Administración de Usuarios y Grupos:
 
@@ -323,35 +325,64 @@ MOUNT		    : TK_Mount OP_MOUNT {
                     $$ = new Nodo($1,$1,$2->Hojas);
                 };
 
-OP_MOUNT	    : OP_MOUNT LOP_MOUNT { }
-		        | LOP_MOUNT { };
+OP_MOUNT	    : OP_MOUNT LOP_MOUNT {
+                    $$ = $1;
+                    $$->Hojas->push_back(*$2);
+                }
+		        | LOP_MOUNT {
+		            $$->Hojas->push_back(*$1);
+		        };
 
-LOP_MOUNT	    : TK_Menos TK_Path TK_Igual DIRECCION { }
-		        | TK_Menos TK_Name TK_Igual NAME { };
+LOP_MOUNT	    : TK_Path TK_Igual DIRECCION {
+                    $$ = (new Nodo($1,D,new vector<Nodo>()));
+                }
+		        | TK_Name TK_Igual NAME {
+		            $$ = (new Nodo($1,NAM,new vector<Nodo>()));
+                };
 
 // -------------------- UNMOUNT --------------------
-UNMOUNT		    : TK_Unmount TK_Id TK_Igual TK_Identificador{ };
+UNMOUNT		    : TK_Unmount TK_Id TK_Igual TK_Identificador{
+                    $$ = new Nodo($1,$3,new vector<Nodo>());
+                };
 
 // -------------------- MKFS --------------------
-MKFS		    : TK_Mkfs OP_MKFS { };
+MKFS		    : TK_Mkfs OP_MKFS {
+                    $$ = new Nodo($1,$1,$2->Hojas);
+                };
 
-OP_MKFS		    : OP_MKFS LOP_MKFS { }
-		        | LOP_MKFS { };
+OP_MKFS		    : OP_MKFS LOP_MKFS {
+                    $$ = $1;
+                    $$->Hojas->push_back(*$2);
+                }
+		        | LOP_MKFS {
+		            $$->Hojas->push_back(*$1);
+                };
 
-LOP_MKFS	    : TK_Menos TK_Id TK_Igual TK_Identificador { }
-		        | TK_Type TK_Igual TK_Full { }
-		        | TK_Menos TK_Fs TK_Igual TYPE_FORMAT{ };
+LOP_MKFS	    : TK_Id TK_Igual TK_Identificador {
+                    $$ = (new Nodo($1,$3,new vector<Nodo>()));
+                }
+		        | TK_Type TK_Igual TK_Full {
+		            $$ = (new Nodo($1,$3,new vector<Nodo>()));
+                }
+		        | TK_Fs TK_Igual TYPE_FORMAT{
+		            $$ = (new Nodo($1,Format,new vector<Nodo>()));
+		        };
 
-TYPE_FORMAT	    : TK_2fs { }
-		        | TK_3fs { };
+TYPE_FORMAT	    : TK_2fs {
+                    Format = $1;
+                }
+		        | TK_3fs {
+		            Format = $1;
+                };
 
 // -------------------- EXEC --------------------
-EXEC		    : TK_Exec TK_Menos TK_Path TK_Igual DIRECCION { };
+EXEC		    : TK_Exec TK_Path TK_Igual DIRECCION {
+                    $$ = new Nodo($1,D,new vector<Nodo>());
+                };
 
 // -------------------- PAUSE --------------------
 PAUSE		    : TK_Pause {
-			        printf("Presione una tecla para continuar...");
-			        int c = getchar();
+			        $$ = new Nodo($1,$1,new vector<Nodo>());
  		        };
 
 // -------------------- REP --------------------
@@ -373,7 +404,7 @@ LOP_REP		    :TK_Id TK_Igual NAME {
                 |TK_Path TK_Igual DIRECCION {
                     $$ = (new Nodo($1,D,new vector<Nodo>()));
                 }
-                |TK_Mame TK_Igual NAME2 {
+                |TK_Name TK_Igual NAME2 {
                     $$ = (new Nodo($1,NAMREP,new vector<Nodo>()));
                 };
 
@@ -392,10 +423,10 @@ LOP_REP		    :TK_Id TK_Igual NAME {
                 | TK_Block {
                     NAMREP = $1;
                 }
-                | TK_Bm_inode {
+                | TK_Bm_Inode{
                     NAMREP = $1;
                 }
-                | TK_Bm_block {
+                | TK_Bm_Block {
                     NAMREP = $1;
                 }
                 | TK_Tree {
@@ -410,4 +441,3 @@ LOP_REP		    :TK_Id TK_Igual NAME {
                 | TK_Ls{
                     NAMREP = $1;
                 };
-

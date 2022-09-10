@@ -14,7 +14,10 @@ void Archivos::Archivo() {
 //Crear arbol de archivos
 void Archivos::Recorrer(vector<Nodo> * Hojas){
     Disk disco;
-    if (raiz->nodo_type == "mkdisk"){
+    if(raiz->nodo_type == "pause"){
+        cout << "Presione enter para continuar" << endl;
+        cin.get();
+    }else if (raiz->nodo_type == "mkdisk"){
         string s = "";
         string f = "";
         string u = "";
@@ -84,6 +87,27 @@ void Archivos::Recorrer(vector<Nodo> * Hojas){
              }
         }
         disco.Rep(id, name, path);
+    }else if (raiz->nodo_type == "exec"){
+        cout << "exec" << endl;
+        string path = "";
+        path = raiz->nodo_value;
+       cout <<"Ruta del exec  " <<path << endl;
+       if(path != ""){
+           ifstream archivo;
+           string line = "";
+           archivo.open(path);
+           if(archivo.fail()){
+               cout << "No se pudo abrir el archivo" << endl;
+           }else{
+               string texto;
+               while(!archivo.eof()){
+                   getline(archivo, texto);
+                   cout << texto << endl;
+               }
+           }
+           archivo.close();
+       }
+
     }else{
         cout << "Comando Erroneo" << endl;
     }
@@ -115,7 +139,7 @@ void Archivos::menuPrincipal(){
                 cout << "Error en el analisis" << endl;
             }
         }
-        cout << "Presione enter para continuar...";
-        cin.get();
+        //cout << "Presione enter para continuar...";
+        //cin.get();
     }while(repetir);
 }
