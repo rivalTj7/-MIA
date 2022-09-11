@@ -16,6 +16,14 @@
 
 using namespace std;
 
+typedef struct AuxBRM{
+    long int inicio;
+    long int final;
+    char tip;
+    string particion;
+}AuxBRM;
+
+
 class Disk {
 public:
     Disk();

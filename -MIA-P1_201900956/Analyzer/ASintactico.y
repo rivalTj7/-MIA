@@ -178,7 +178,10 @@ COMANDOS        : MKDISK {raiz = $1;}
                 | MKFS { raiz = $1;}
                 | EXEC { raiz = $1;}
                 | PAUSE { raiz = $1;}
-                | REP { raiz = $1;} ;
+                | REP { raiz = $1;}
+
+                ;
+
 
                 //Crear Administración de Usuarios y Grupos:
 

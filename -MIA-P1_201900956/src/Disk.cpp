@@ -143,6 +143,14 @@ void Disk::fdisk(string s, string u, string p, string t, string f, string d, str
 
             }else if (t == "l"){
                 cout << "Crear Partición Lógica .................... . . . . " << endl;
+            }else{
+                cout << "Crear Partición Primaria .................... . . . . " << endl;
+                if(validName(p, n) == 1){
+                    throw runtime_error("El nombre de la partición ya existe");
+                }else{
+                    cout << "Creando Particion Primario" << endl;
+                    createPrimariKey(p, t, f, size, n);
+                }
             }
 
 
@@ -152,10 +160,81 @@ void Disk::fdisk(string s, string u, string p, string t, string f, string d, str
 }
 
 void Disk::createPrimariKey(string path, string type, string fit, int add, string name){
-    StructD::MBR disco;
-    //Validar el tamaño de la particion
-    if (add >= disco.mbr_tamano){
-        throw runtime_error("El tamaño de la partición es mayor al tamaño del disco");
+    try {
+        FILE *file;
+        file = fopen(path.c_str(), "rb+");
+        rewind(file);
+        StructD::MBR disco;
+        fread(&disco, sizeof(disco), 1, file);
+
+        vector<StructD::Partition> partitions = Partittion(disco);
+
+        int verParticion = 0;
+        for (int i = 0; i < 4; i++){
+            if(partitions[i].part_status == '1'){
+                verParticion++;
+            }
+        }
+
+        if (verParticion == 4){
+            throw runtime_error("El disco ya tiene 4 particiones");
+        }
+        //Validar el tamaño de la particion
+        if (add >= disco.mbr_tamano){
+            throw runtime_error("El tamaño de la partición es mayor al tamaño del disco");
+        }else if (add < 0){
+            throw runtime_error("El tamaño de la partición es menor a 0");
+        }
+        //Validar que solo existan como maximo 3 particiones primarias
+        int cont = 0;
+        for(int i = 0; i < 4; i++){
+            if(partitions[i].part_type == 'p' && partitions[i].part_status == '1'){
+                cont++;
+            }
+        }
+        if (cont >= 3){
+            throw runtime_error("El disco ya tiene 3 particiones primarias");
+        }
+
+        vector<AuxBRM> Aux;
+        for (int i = 0; i < 4; i++){
+            if (partitions[i].part_status == '1'){
+                AuxBRM aux;
+                aux.inicio = partitions[i].part_start;
+                aux.final = partitions[i].part_start + partitions[i].part_s;
+                aux.particion = partitions[i].part_name;
+                Aux.push_back(aux);
+            }
+        }
+        //tam
+        if(1+1 ==2) {
+            AuxBRM aux2;
+            aux2.inicio = 0;
+            aux2.final = sizeof(disco) + 1;
+            aux2.particion = "MBR";
+            Aux.push_back(aux2);
+        }
+
+        AuxBRM temp;
+        for ( int i = 0; i<Aux.size(); i++){
+            for (int j = 0; j < Aux.size()-1; j++){
+                if (Aux[i].inicio < Aux[j+1].inicio){
+                    temp = Aux[j];
+                    Aux[j] = Aux[j+1];
+                    Aux[j+1] = temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < Aux.size(); i++){
+            cout << "Inicio: " << Aux[i].inicio << " Final: " << Aux[i].final << " Particion: " << Aux[i].particion << endl;
+        }
+
+
+
+
+    }catch(exception &e){
+        cout << "Error: " << e.what() << endl;
     }
 }
 
